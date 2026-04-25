@@ -31,7 +31,5 @@ fi
 
 echo "Built ${OUT_LIB}"
 
-# installDebug quiet with minimal output
 ./gradlew installDebug --quiet
-# then launch the app on the first connected device
 adb shell am start -n "io.github.stupidrepo.RaylibGoGame/.GameNativeActivity"
