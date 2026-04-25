@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+clear
+
 TOOLCHAIN_BIN="${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
 ANDROID_API="${ANDROID_API:-21}"
 OUT_DIR="${OUT_DIR:-android/libs/arm64-v8a}"

@@ -28,6 +28,7 @@ func init() {
 	rl.SetMain(main)
 }
 
+//goland:noinspection GoUnusedConst
 const (
 	LightDirectional = iota
 	LightPoint
@@ -318,7 +319,8 @@ func main() {
 			if lights[i].Enabled {
 				state = "off"
 			}
-			button := gui.Button(rl.NewRectangle(float32(int(insets.Left)+((150+10)*i)), float32(CurrentHeight-60), 150, 60), fmt.Sprintf("Turn %s light #%d", state, i+1))
+
+			button := gui.Button(rl.NewRectangle(float32((CurrentWidth/2)-150+int32(i-1)*(150+10)), float32(CurrentHeight-insets.Bottom-60-5), 150, 60), fmt.Sprintf("Turn %s light #%d", state, i+1))
 			if button {
 				lights[i].Enabled = !lights[i].Enabled
 				UpdateLight(shader, lights[i])
