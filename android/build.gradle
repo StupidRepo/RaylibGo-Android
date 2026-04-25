@@ -1,0 +1,34 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace = "io.github.stupidrepo.RaylibGoGame"
+    compileSdkVersion 36
+
+    defaultConfig {
+        applicationId "io.github.stupidrepo.RaylibGoGame"
+        minSdkVersion 21
+        targetSdkVersion 36
+        versionCode 1
+        versionName '1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            zipAlignEnabled true
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+
+            manifest.srcFile 'AndroidManifest.xml'
+        }
+    }
+}
+
+dependencies {
+}
