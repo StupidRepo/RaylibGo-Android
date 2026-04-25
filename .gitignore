@@ -72,4 +72,5 @@ google-services.json
 *.hprof
 
 # Mine
-android/assets/
+android/assets/resources
+game/resources
