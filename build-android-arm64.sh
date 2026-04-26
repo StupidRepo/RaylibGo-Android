@@ -23,7 +23,7 @@ PATH="${TOOLCHAIN_BIN}:${PATH}" \
 CC="${CC_BIN}" \
 CGO_ENABLED=1 GOOS=android GOARCH=arm64 \
 CGO_CFLAGS="-I${NATIVE_APP_GLUE_DIR} ${CGO_CFLAGS:-}" \
-go build -C ./game/ -buildmode=c-shared -ldflags="-s -w -extldflags=-Wl,-soname,libgame.so" \
+go build -C ./game/ -a -buildmode=c-shared -ldflags="-s -w -extldflags=-Wl,-soname,libgame.so" \
 -o "../${OUT_LIB}"
 
 if [[ ! -s "${OUT_LIB}" ]]; then
