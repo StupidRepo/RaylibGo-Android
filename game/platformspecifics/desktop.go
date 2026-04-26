@@ -12,6 +12,10 @@ const (
 	GLSLVersion = 330
 )
 
+func (p *Platform) GetOS() PlatformEnum {
+	return PlatformDesktop
+}
+
 func (p *Platform) GetWindowSize() (int32, int32) {
 	return int32(rl.GetRenderWidth()), int32(rl.GetRenderHeight())
 }

@@ -17,6 +17,13 @@ const (
 	AndroidLogSilent
 )
 
+type PlatformEnum int
+
+const (
+	PlatformAndroid PlatformEnum = iota
+	PlatformDesktop
+)
+
 type Insets struct {
 	Left   int32
 	Top    int32
@@ -25,6 +32,8 @@ type Insets struct {
 }
 
 type PlatformFunctions interface {
+	GetOS() PlatformEnum
+
 	GetWindowSize() (int32, int32)
 	GetInsets() Insets
 
