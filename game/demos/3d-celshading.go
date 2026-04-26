@@ -33,6 +33,13 @@ type CelShadingDemo struct {
 
 var copyright = "(c) Old Rusty Car model by Renafox (https://skfb.ly/LxRy)"
 
+func (c *CelShadingDemo) GetSpec() DemoSpec {
+	return DemoSpec{
+		Name:    "3D Cel Shading",
+		Summary: "A demo showcasing cel shading with an outline effect on a 3D model.",
+	}
+}
+
 func (c *CelShadingDemo) Init() {
 	// car
 	c.car = rl.LoadModel("resources/models/old_car_new.glb")
@@ -104,7 +111,7 @@ func (c *CelShadingDemo) Update(CurrentWidth int32, CurrentHeight int32) {
 }
 
 func (c *CelShadingDemo) Draw() {
-	rl.BeginDrawing()
+	// rl.BeginDrawing()
 	rl.ClearBackground(rl.White)
 
 	rl.BeginMode3D(c.camera)
@@ -133,14 +140,15 @@ func (c *CelShadingDemo) Draw() {
 
 	c.DrawUI()
 
-	rl.EndDrawing()
+	// rl.EndDrawing()
 }
 
 func (c *CelShadingDemo) DrawUI() {
 	insets := c.Platform.GetInsets()
 
 	// insets.Left so that it's matching ;)
-	rl.DrawText(copyright, c.screenWidth-insets.Left-rl.MeasureText(copyright, 20), insets.Top, 20, rl.SkyBlue)
+	fontSize := tools.UiPxToDp(20)
+	tools.DrawTextCenter(copyright, float32(c.screenWidth), fontSize, fontSize, rl.Black)
 	rl.DrawFPS(insets.Left, insets.Top)
 
 	// 2 gui buttons that are in the screen center and above bottom bar (insets.bottom)

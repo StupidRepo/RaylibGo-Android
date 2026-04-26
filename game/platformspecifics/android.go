@@ -12,9 +12,6 @@ package platformspecifics
 extern struct android_app* GetAndroidApp();
 
 static int ndk_window_width() {
-    // we need a pointer to NativeWindow...
-	// but we can get that with GetAndroidApp()!
-
 	struct android_app* app = GetAndroidApp();
 	if (!app || !app->window) return 0;
 

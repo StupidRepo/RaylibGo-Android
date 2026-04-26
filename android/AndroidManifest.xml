@@ -19,7 +19,6 @@
 			android:name=".GameNativeActivity"
 			android:exported="true"
 			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:screenOrientation="landscape"
 			android:clearTaskOnLaunch="true"
 		>
 

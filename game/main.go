@@ -13,8 +13,13 @@ import (
 )
 
 var (
-	CurrentHeight int32
-	CurrentWidth  int32
+	lastHeight int32
+	lastWidth  int32
+
+	didResize bool
+
+	currentHeight int32
+	currentWidth  int32
 )
 
 func init() {
@@ -26,20 +31,24 @@ func init() {
 var platform = ps.Platform{}
 
 func initRaylib() {
-	rl.SetConfigFlags(rl.FlagVsyncHint | rl.FlagWindowResizable | rl.FlagMsaa4xHint | rl.FlagFullscreenMode)
+	rl.SetConfigFlags(rl.FlagWindowResizable | rl.FlagMsaa4xHint | rl.FlagFullscreenMode)
 
 	resize()
 
-	rl.InitWindow(CurrentWidth, CurrentHeight, "Android Game")
+	rl.InitWindow(currentWidth, currentHeight, "Android Game")
 	rl.InitAudioDevice()
 }
 
 func resize() {
-	CurrentWidth, CurrentHeight = platform.GetWindowSize()
+	didResize = false
+	currentWidth, currentHeight = platform.GetWindowSize()
 
-	if rl.IsWindowResized() {
-		rl.SetFramebufferWidth(CurrentWidth)
-		rl.SetFramebufferHeight(CurrentHeight)
+	if currentWidth != lastWidth || currentHeight != lastHeight {
+		didResize = true
+		lastWidth = currentWidth
+		lastHeight = currentHeight
+
+		platform.LogIt(ps.AndroidLogInfo, ps.GameTag, fmt.Sprintf("Window resized: %d x %d", currentWidth, currentHeight))
 	}
 }
 
@@ -58,7 +67,6 @@ func main() {
 	resize()
 	windowShouldClose := false
 
-	// Init stage
 	platform.LogIt(ps.AndroidLogInfo, ps.GameTag, "Initializing game...")
 	game.Init()
 
@@ -69,31 +77,46 @@ func main() {
 			windowShouldClose = true
 		}
 		resize()
+		if didResize && platform.GetOS() == ps.PlatformAndroid {
+			rl.SetWindowSize(int(currentWidth), int(currentHeight))
+			platform.LogIt(ps.AndroidLogInfo, ps.GameTag, fmt.Sprintf("Adjusted window size to: %d x %d", currentWidth, currentHeight))
+		}
 
 		frameCounter++
 		if frameCounter >= 400 {
 			frameCounter = 0
 
 			// switch to the next game in the list, looping back round if we reach the end
-			currentGameIndex := 0
-			for i, g := range games {
-				if g == game {
-					currentGameIndex = i
-					break
-				}
-			}
-			nextGameIndex := (currentGameIndex + 1) % len(games)
-			switchGame(nextGameIndex)
+			cgi := getCurrentGameIndex()
+			ngi := (cgi + 1) % len(games)
+
+			platform.LogIt(ps.AndroidLogInfo, ps.GameTag, fmt.Sprintf("Switching demo: %s -> %s.", games[cgi].GetSpec().Name, games[ngi].GetSpec().Name))
+			switchGame(ngi)
 		}
 
-		game.Update(CurrentWidth, CurrentHeight)
+		game.Update(currentWidth, currentHeight)
+
+		rl.BeginDrawing()
 		game.Draw()
+		rl.EndDrawing()
 	}
 
 	game.Deinit()
 
 	rl.CloseWindow()
 	os.Exit(0)
+}
+
+func getCurrentGameIndex() int {
+	currentGameIndex := 0
+	for i, g := range games {
+		if g == game {
+			currentGameIndex = i
+			break
+		}
+	}
+
+	return currentGameIndex
 }
 
 func switchGame(index int) {
