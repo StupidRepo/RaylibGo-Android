@@ -43,29 +43,50 @@ func resize() {
 	}
 }
 
-var game demos.Demo
+var games = []demos.Demo{
+	&demos.CelShadingDemo{
+		Platform: &platform,
+	},
+	&demos.TwoDDemo{
+		Platform: &platform,
+	},
+}
+var game = games[0]
 
 func main() {
 	initRaylib()
 	resize()
 	windowShouldClose := false
 
-	game = &demos.CelShadingDemo{
-		Platform: &platform,
-	}
-
 	// Init stage
 	platform.LogIt(ps.AndroidLogInfo, ps.GameTag, "Initializing game...")
 	game.Init()
 
+	frameCounter := 0
+
 	for !windowShouldClose {
-		if (runtime.GOOS == "android" && rl.IsKeyDown(rl.KeyBack)) || rl.WindowShouldClose() {
+		if (platform.GetOS() == ps.PlatformAndroid && rl.IsKeyDown(rl.KeyBack)) || rl.WindowShouldClose() {
 			windowShouldClose = true
 		}
 		resize()
 
-		game.Update(CurrentWidth, CurrentHeight)
+		frameCounter++
+		if frameCounter >= 400 {
+			frameCounter = 0
 
+			// switch to the next game in the list, looping back round if we reach the end
+			currentGameIndex := 0
+			for i, g := range games {
+				if g == game {
+					currentGameIndex = i
+					break
+				}
+			}
+			nextGameIndex := (currentGameIndex + 1) % len(games)
+			switchGame(nextGameIndex)
+		}
+
+		game.Update(CurrentWidth, CurrentHeight)
 		game.Draw()
 	}
 
@@ -73,4 +94,13 @@ func main() {
 
 	rl.CloseWindow()
 	os.Exit(0)
+}
+
+func switchGame(index int) {
+	if index >= 0 && index < len(games) {
+		game.Deinit()
+
+		game = games[index]
+		game.Init()
+	}
 }

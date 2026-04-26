@@ -143,6 +143,10 @@ const (
 	GLSLVersion = 100
 )
 
+func (p *Platform) GetOS() PlatformEnum {
+	return PlatformAndroid
+}
+
 func (p *Platform) GetWindowSize() (int32, int32) {
 	width, height := int32(C.ndk_window_width()), int32(C.ndk_window_height())
 	return width, height
