@@ -141,7 +141,7 @@ const (
 )
 
 func (p *Platform) GetOS() PlatformEnum {
-	return PlatformAndroid
+	return PlatformMobile
 }
 
 func (p *Platform) GetWindowSize() (int32, int32) {

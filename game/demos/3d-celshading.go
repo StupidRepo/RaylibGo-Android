@@ -19,6 +19,7 @@ type CelShadingDemo struct {
 
 	outlineShader       rl.Shader
 	outlineThicknessLoc int32
+	outlineTimeLoc      int32
 
 	lights []tools.Light
 
@@ -60,12 +61,13 @@ func (c *CelShadingDemo) Init() {
 	}
 
 	// outline shader
-	c.thickness = 0.003
+	c.thickness = 0.001
 	c.outlineShader = rl.LoadShader(
 		fmt.Sprintf("resources/shaders/glsl%d/outline_hull.vs", ps.GLSLVersion),
 		fmt.Sprintf("resources/shaders/glsl%d/outline_hull.fs", ps.GLSLVersion))
 	c.outlineThicknessLoc = rl.GetShaderLocation(c.outlineShader, "outlineThickness")
 	rl.SetShaderValue(c.outlineShader, c.outlineThicknessLoc, []float32{c.thickness}, rl.ShaderUniformFloat)
+	c.outlineTimeLoc = rl.GetShaderLocation(c.outlineShader, "time")
 
 	// camera
 	c.camera = rl.NewCamera3D(rl.NewVector3(9.0, 4.0, 9.0), rl.NewVector3(0, 0.5, 0), rl.NewVector3(0, 1.0, 0), 45.0, rl.CameraPerspective)
@@ -103,6 +105,7 @@ func (c *CelShadingDemo) Update(CurrentWidth int32, CurrentHeight int32) {
 
 	// outline upd
 	rl.SetShaderValue(c.outlineShader, c.outlineThicknessLoc, []float32{c.thickness}, rl.ShaderUniformFloat)
+	rl.SetShaderValue(c.outlineShader, c.outlineTimeLoc, []float32{float32(rl.GetTime())}, rl.ShaderUniformFloat)
 
 	// lights upd
 	for i := range c.lights {
@@ -111,7 +114,6 @@ func (c *CelShadingDemo) Update(CurrentWidth int32, CurrentHeight int32) {
 }
 
 func (c *CelShadingDemo) Draw() {
-	// rl.BeginDrawing()
 	rl.ClearBackground(rl.White)
 
 	rl.BeginMode3D(c.camera)
@@ -133,14 +135,12 @@ func (c *CelShadingDemo) Draw() {
 	rl.SetCullFace(1) // CULL_FACE_BACK
 	// outline end
 
-	rl.DrawModel(c.car, rl.Vector3Zero(), 0.75, rl.Gold)
+	rl.DrawModel(c.car, rl.Vector3Zero(), 0.75, rl.White)
 	rl.DrawGrid(10, 10.0)
 
 	rl.EndMode3D()
 
 	c.DrawUI()
-
-	// rl.EndDrawing()
 }
 
 func (c *CelShadingDemo) DrawUI() {
@@ -177,10 +177,10 @@ func (c *CelShadingDemo) DrawUI() {
 	if gui.Button(rl.NewRectangle(float32(startX+3*(buttonWidth+buttonSpacing)), float32(y), float32(buttonWidth), float32(buttonHeight)), "Thickness DECREASE") {
 		c.thickness -= 0.001
 	}
-	c.thickness = rl.Clamp(c.thickness, 0.001, 0.01)
+	c.thickness = rl.Clamp(c.thickness, 0.001, 0.006)
 
 	// if we're on android, draw mobile UI for zooming in/out
-	if c.Platform.GetOS() == ps.PlatformAndroid {
+	if c.Platform.GetOS() == ps.PlatformMobile {
 		c.DrawMobileUI(insets)
 	}
 }

@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
+	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -59,8 +61,14 @@ var games = []demos.Demo{
 	&demos.TwoDDemo{
 		Platform: &platform,
 	},
+	&demos.ThreeDMobileDemo{
+		Platform: &platform,
+	},
 }
 var game = games[0]
+
+var panelOpen bool = false
+var scrollIdx int32 = 0
 
 func main() {
 	initRaylib()
@@ -70,34 +78,34 @@ func main() {
 	platform.LogIt(ps.AndroidLogInfo, ps.GameTag, "Initializing game...")
 	game.Init()
 
-	frameCounter := 0
-
 	for !windowShouldClose {
-		if (platform.GetOS() == ps.PlatformAndroid && rl.IsKeyDown(rl.KeyBack)) || rl.WindowShouldClose() {
+		if (platform.GetOS() == ps.PlatformMobile && rl.IsKeyDown(rl.KeyBack)) || rl.WindowShouldClose() {
 			windowShouldClose = true
 		}
 		resize()
-		if didResize && platform.GetOS() == ps.PlatformAndroid {
+		if didResize && platform.GetOS() == ps.PlatformMobile {
 			rl.SetWindowSize(int(currentWidth), int(currentHeight))
 			platform.LogIt(ps.AndroidLogInfo, ps.GameTag, fmt.Sprintf("Adjusted window size to: %d x %d", currentWidth, currentHeight))
 		}
 
-		frameCounter++
-		if frameCounter >= 400 {
-			frameCounter = 0
+		// frameCounter++
+		// if frameCounter >= 400 {
+		// 	frameCounter = 0
 
-			// switch to the next game in the list, looping back round if we reach the end
-			cgi := getCurrentGameIndex()
-			ngi := (cgi + 1) % len(games)
+		// 	// switch to the next game in the list, looping back round if we reach the end
+		// 	cgi := getCurrentGameIndex()
+		// 	ngi := (cgi + 1) % len(games)
 
-			platform.LogIt(ps.AndroidLogInfo, ps.GameTag, fmt.Sprintf("Switching demo: %s -> %s.", games[cgi].GetSpec().Name, games[ngi].GetSpec().Name))
-			switchGame(ngi)
-		}
+		// 	platform.LogIt(ps.AndroidLogInfo, ps.GameTag, fmt.Sprintf("Switching demo: %s -> %s.", games[cgi].GetSpec().Name, games[ngi].GetSpec().Name))
+		// 	switchGame(ngi)
+		// }
 
 		game.Update(currentWidth, currentHeight)
 
 		rl.BeginDrawing()
 		game.Draw()
+
+		drawDemoUI()
 		rl.EndDrawing()
 	}
 
@@ -126,4 +134,33 @@ func switchGame(index int) {
 		game = games[index]
 		game.Init()
 	}
+}
+
+// drawDemoUI draws a small button in the middle-center, which opens a full-screen ui panel with a scroll list to allow you to choose a demo to view.
+func drawDemoUI() {
+	insets := platform.GetInsets()
+
+	if panelOpen {
+		cgi := getCurrentGameIndex()
+		selected := gui.ListView(rl.NewRectangle(float32(currentWidth/2)-150, float32(currentHeight/2)-150, 300, 300), getDemoNames(), &scrollIdx, int32(cgi))
+		if selected >= 0 && selected < int32(len(games)) && int(selected) != cgi {
+			platform.LogIt(ps.AndroidLogInfo, ps.GameTag, fmt.Sprintf("Switching demo: %s -> %s.", game.GetSpec().Name, games[selected].GetSpec().Name))
+			switchGame(int(selected))
+
+			panelOpen = false
+		}
+	} else {
+		if gui.Button(rl.NewRectangle(float32(currentWidth)-float32(insets.Left)-100, float32(currentHeight)-40-float32(insets.Bottom)-10, 100, 40), gui.IconText(gui.ICON_ARROW_LEFT_FILL, "")) {
+			panelOpen = true
+		}
+	}
+}
+
+func getDemoNames() string {
+	var names strings.Builder
+	for _, g := range games {
+		fmt.Fprintf(&names, "%s;", g.GetSpec().Name)
+	}
+
+	return names.String()[:len(names.String())-1] // remove the trailing semicolon
 }

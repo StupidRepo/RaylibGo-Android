@@ -20,7 +20,7 @@ const (
 type PlatformEnum int
 
 const (
-	PlatformAndroid PlatformEnum = iota
+	PlatformMobile PlatformEnum = iota
 	PlatformDesktop
 )
 

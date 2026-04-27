@@ -31,7 +31,6 @@ func (d *TwoDDemo) Update(CurrentWidth int32, CurrentHeight int32) {
 }
 
 func (d *TwoDDemo) Draw() {
-	// rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
 
 	fontSize := tools.UiPxToDp(20)
@@ -47,8 +46,6 @@ func (d *TwoDDemo) Draw() {
 
 	rl.DrawRectangleGradientH(d.screenWidth/2-150, d.screenHeight/2, 300, 100, rl.Blue, rl.Green)
 	rl.DrawCircleGradient(d.screenWidth/2, d.screenHeight/2+150, 50, rl.Red, rl.Yellow)
-
-	// rl.EndDrawing()
 }
 
 func (d *TwoDDemo) Deinit() {
